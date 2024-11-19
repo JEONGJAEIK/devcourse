@@ -33,7 +33,7 @@ public class Main {
             } else if (cmd.equals("목록")) {
                 System.out.println("번호 / 작가 / 명언");
                 System.out.println("----------------------");
-                for (int i = numbers.size() - 1; i > - 1; i--) {
+                for (int i = numbers.size() - 1; i > -1; i--) {
                     System.out.println(numbers.get(i) + " / " + authors.get(i) + " / " + wise_sayings.get(i));
                 }
             } else if (cmd.contains("삭제")) {
@@ -48,8 +48,20 @@ public class Main {
                     System.out.println(delete_number + "번 명언은 존재하지 않습니다.");
                 }
 
+            } else if (cmd.contains("수정")) {
+                char update_number_char = (char) cmd.charAt(6);
+                int update_number = Character.getNumericValue(update_number_char);
+                try {
+                    System.out.println("명언(기존) : " + wise_sayings.get(numbers.indexOf(update_number)));
+                    System.out.print("명언 : ");
+                    wise_sayings.set(numbers.indexOf(update_number), scanner.nextLine());
+                    System.out.println("작가(기존) : " + authors.get(numbers.indexOf(update_number)));
+                    System.out.print("작가 : ");
+                    authors.set(numbers.indexOf(update_number), scanner.nextLine());
+                } catch (Exception e1) {
+                    System.out.println(update_number + "번 명언은 존재하지 않습니다.");
+                }
             }
-
         } while (!Objects.equals(cmd, "종료"));
     }
 }
