@@ -58,6 +58,7 @@ public class Main {
                     System.out.println("작가(기존) : " + authors.get(numbers.indexOf(update_number)));
                     System.out.print("작가 : ");
                     authors.set(numbers.indexOf(update_number), scanner.nextLine());
+                    System.out.println(update_number + "번 명언이 수정되었습니다.");
                 } catch (Exception e1) {
                     System.out.println(update_number + "번 명언은 존재하지 않습니다.");
                 }
