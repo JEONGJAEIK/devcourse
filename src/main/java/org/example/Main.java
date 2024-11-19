@@ -32,6 +32,14 @@ public class Main {
                 for (int i = count - 1; i > - 1; i--) {
                     System.out.println(numbers[i] + " / " + authors[i] + " / " + wise_sayings[i]);
                 }
+            } else if (cmd.contains("삭제")) {
+                char delete_number_char = (char) cmd.charAt(6);
+                int delete_number = Character.getNumericValue(delete_number_char);
+                wise_sayings[delete_number - 1] = null;
+                authors[delete_number - 1] = null;
+                numbers[delete_number - 1] = 0;
+                System.out.println(delete_number + "번 명언이 삭제되었습니다");
+
             }
 
         } while (!Objects.equals(cmd, "종료"));
