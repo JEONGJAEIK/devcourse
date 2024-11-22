@@ -4,6 +4,9 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -14,8 +17,8 @@ public class Main {
         ArrayList<Integer> numbers = new ArrayList<>();
         String directoryPath = "C:\\Users\\wodlr\\OneDrive\\바탕 화면\\정재익\\프로젝트\\devcourse\\src\\db\\wiseSaying";
 
-        int number = 1;
-        loadList(directoryPath,numbers,wiseSayings,authors);
+
+        int number = loadList(directoryPath,numbers,wiseSayings,authors);
         System.out.println("== 명언 앱 ==");
 
         while (true) {
@@ -29,6 +32,8 @@ public class Main {
                 deleteList(cmd, wiseSayings, numbers, authors, directoryPath);
             } else if (cmd.contains("수정")) {
                 updateList(cmd, wiseSayings, numbers, scanner, authors, directoryPath);
+            } else if (cmd.contains("빌드")) {
+                mergedFile(directoryPath);
             } else if (cmd.contains("종료")) {
                 deleteList(number, directoryPath);
                 break;
@@ -55,10 +60,10 @@ public class Main {
         System.out.println(number + "번 명언이 등록되었습니다.");
         String Createfilename = String.format("%s\\%d.json", directoryPath, number);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(Createfilename))) {
-            writer.write("{ \n");
-            writer.write("  id : " + (number) + "," + "\n");
-            writer.write("  content : " + wise_saying + "," + "\n");
-            writer.write("  author : " + author + "\n");
+            writer.write("{ \n  ");
+            writer.write("\"id\" : " + (number) + "," + "\n  ");
+            writer.write("\"content\" : " + '"' + wise_saying + '"' + "," + "\n  ");
+            writer.write("\"author\" : " + '"' + author  + '"' + "\n");
             writer.write("}");
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -111,10 +116,10 @@ public class Main {
 
             String filename = String.format("%s\\%d.json", directoryPath, update_number);
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
-                writer.write("{ \n");
-                writer.write("  id : " + update_number + "," + "\n");
-                writer.write("  content : " + wise_saying + "," + "\n");
-                writer.write("  author : " + author + "\n");
+                writer.write("{ \n  ");
+                writer.write("\"id\" : " + update_number + "," + "\n  ");
+                writer.write("\"content\" : " + '"' + wise_saying + '"' + "," + "\n  ");
+                writer.write("\"author\" : " + '"' + author  + '"' + "\n");
                 writer.write("}");
             } catch (IOException _) {
             }
@@ -154,13 +159,66 @@ public class Main {
                 wiseSayings.add(content);
                 authors.add(author);
                 if (id >= lastId) {
-                    lastId = id + 1; // 마지막 ID 갱신
+                    lastId = id + 1;
                 }
-            } catch (IOException e) {
-                System.out.println("파일 읽기 실패: " + file.getName());
+            } catch (IOException _) {
             }
         }
         return lastId;
+    }
+
+    private static void mergedFile(String directoryPath) {
+        String mergedfile = directoryPath + "\\" + "data.json";
+
+        try {
+                File folder = new File(directoryPath);
+                File[] files = folder.listFiles((dir, name) -> name.endsWith(".json"));
+
+                if (files == null || files.length == 0) {
+                    System.out.println("JSON 파일이 없습니다.");
+                    return;
+                }
+
+                List<String> jsonObjects = new ArrayList<>();
+
+                for (File file : files) {
+                    if (file.getName().equalsIgnoreCase("data.json")) {
+                        System.out.println("파일 제외: " + file.getName());
+                        continue;
+                    }
+                    String content = new String(Files.readAllBytes(file.toPath())).trim();
+
+                    if (content.startsWith("{") && content.endsWith("}")) {
+                        jsonObjects.add(content);
+                    } else if (content.startsWith("[") && content.endsWith("]")) {
+                        content = content.substring(1, content.length() - 1).trim();
+                        if (!content.isEmpty()) {
+                            jsonObjects.add(content);
+                        }
+                    } else {
+                        System.out.println("잘못된 JSON 파일 형식: " + file.getName());
+                    }
+                }
+
+            StringBuilder mergedJson = new StringBuilder("[\n");
+
+            for (String jsonObject : jsonObjects) {
+                jsonObject = jsonObject.replace("}","  }");
+                mergedJson.append("  ").append(jsonObject).append(",\n");
+            }
+
+            // 마지막 쉼표 제거
+            if (!jsonObjects.isEmpty()) {
+                mergedJson.setLength(mergedJson.length() - 2);
+            }
+
+            mergedJson.append("\n]");
+
+            Files.write(Paths.get(mergedfile), mergedJson.toString().getBytes());
+
+        } catch (IOException e) {
+            System.err.println("오류 발생: " + e.getMessage());
+        }
     }
 }
 
