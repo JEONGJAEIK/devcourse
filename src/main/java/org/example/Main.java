@@ -10,27 +10,26 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) throws IOException {
         Scanner scanner = new Scanner(System.in);
-        ArrayList<String> wise_sayings = new ArrayList<>();
+        ArrayList<String> wiseSayings = new ArrayList<>();
         ArrayList<String> authors = new ArrayList<>();
         ArrayList<Integer> numbers = new ArrayList<>();
-        String directoryPath = String.format("C:\\Users\\wodlr\\OneDrive\\바탕 화면\\정재익\\프로젝트\\devcourse\\src\\db\\wiseSaying");
+        String directoryPath = "C:\\Users\\wodlr\\OneDrive\\바탕 화면\\정재익\\프로젝트\\devcourse\\src\\db\\wiseSaying";
         File directory = new File(directoryPath);
 
-        String cmd;
         int number = 1;
         System.out.println("== 명언 앱 ==");
 
         while (true) {
             System.out.print("명령) ");
-            cmd = scanner.nextLine();
+            String cmd = scanner.nextLine();
             if (cmd.equals("등록")) {
-                number = createList(wise_sayings, scanner, authors, numbers, number, directory, directoryPath);
+                number = createList(wiseSayings, scanner, authors, numbers, number, directoryPath);
             } else if (cmd.equals("목록")) {
-                showList(numbers, authors, wise_sayings);
+                showList(numbers, authors, wiseSayings);
             } else if (cmd.contains("삭제")) {
-                deleteList(cmd, wise_sayings, numbers, authors);
+                deleteList(cmd, wiseSayings, numbers, authors, directoryPath);
             } else if (cmd.contains("수정")) {
-                updateList(cmd, wise_sayings, numbers, scanner, authors, directory, directoryPath);
+                updateList(cmd, wiseSayings, numbers, scanner, authors, directoryPath);
             } else if (cmd.contains("종료")) {
                 deleteList(number, directory, directoryPath);
                 break;
@@ -39,9 +38,6 @@ public class Main {
     }
 
     private static void deleteList(int number, File directory, String directoryPath) throws IOException {
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
         String lastfilename = String.format("%s\\lastId.txt", directoryPath);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(lastfilename))) {
             writer.write(String.valueOf(number - 1));
@@ -49,7 +45,7 @@ public class Main {
         }
     }
 
-    private static int createList(ArrayList<String> wise_sayings, Scanner scanner, ArrayList<String> authors, ArrayList<Integer> numbers, int number, File directory, Object directoryPath) {
+    private static int createList(ArrayList<String> wise_sayings, Scanner scanner, ArrayList<String> authors, ArrayList<Integer> numbers, int number, Object directoryPath) {
         System.out.print("명언 : ");
         String wise_saying = scanner.nextLine();
         wise_sayings.add(wise_saying);
@@ -58,14 +54,13 @@ public class Main {
         authors.add(author);
         numbers.add(number);
         System.out.println(number + "번 명언이 등록되었습니다.");
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
         String Createfilename = String.format("%s\\%d.json", directoryPath, number);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(Createfilename))) {
-            writer.write(wise_saying + ' ');
-            writer.write(author + ' ');
-            writer.write(String.valueOf(number) + ' ');
+            writer.write("{ \n");
+            writer.write("  id : " + (number) + "," + "\n");
+            writer.write("  content : " + wise_saying + "," + "\n");
+            writer.write("  author : " + author + "\n");
+            writer.write("}");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -81,20 +76,23 @@ public class Main {
         }
     }
 
-    private static void deleteList(String cmd, ArrayList<String> wise_sayings, ArrayList<Integer> numbers, ArrayList<String> authors) {
+    private static void deleteList(String cmd, ArrayList<String> wise_sayings, ArrayList<Integer> numbers, ArrayList<String> authors, Object directoryPath) {
         char delete_number_char = (char) cmd.charAt(6);
         int delete_number = Character.getNumericValue(delete_number_char);
         try {
             wise_sayings.remove(numbers.indexOf(delete_number));
             authors.remove(numbers.indexOf(delete_number));
             numbers.remove((Integer) delete_number);
+            String filename = String.format("%s\\%d.json", directoryPath, delete_number);
+            File jsonFile = new File(filename);
+            jsonFile.delete();
             System.out.println(delete_number + "번 명언이 삭제되었습니다.");
         } catch (Exception e1) {
             System.out.println(delete_number + "번 명언은 존재하지 않습니다.");
         }
     }
 
-    private static void updateList(String cmd, ArrayList<String> wise_sayings, ArrayList<Integer> numbers, Scanner scanner, ArrayList<String> authors, File directory, String directoryPath) {
+    private static void updateList(String cmd, ArrayList<String> wise_sayings, ArrayList<Integer> numbers, Scanner scanner, ArrayList<String> authors, String directoryPath) {
         char update_number_char = cmd.charAt(6);
         int update_number = Character.getNumericValue(update_number_char);
         try {
@@ -113,14 +111,12 @@ public class Main {
             System.out.println(update_number + "번 명언이 수정되었습니다.");
 
             String filename = String.format("%s\\%d.json", directoryPath, update_number);
-
-            if (!directory.exists()) {
-                directory.mkdirs();
-            }
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
-                writer.write(wise_saying + "\n"); // 명언 기록
-                writer.write(author + "\n"); // 작가 기록
-                writer.write(update_number + "\n"); // 번호 기록
+                writer.write("{ \n");
+                writer.write("  id : " + update_number + "," + "\n");
+                writer.write("  content : " + wise_saying + "," + "\n");
+                writer.write("  author : " + author + "\n");
+                writer.write("}");
             } catch (IOException _) {
             }
         } catch (Exception e1) {
@@ -128,6 +124,5 @@ public class Main {
         }
     }
 }
-
 
 
