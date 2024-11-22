@@ -1,22 +1,21 @@
 package org.example;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws IOException {
+
         Scanner scanner = new Scanner(System.in);
         ArrayList<String> wiseSayings = new ArrayList<>();
         ArrayList<String> authors = new ArrayList<>();
         ArrayList<Integer> numbers = new ArrayList<>();
         String directoryPath = "C:\\Users\\wodlr\\OneDrive\\바탕 화면\\정재익\\프로젝트\\devcourse\\src\\db\\wiseSaying";
-        File directory = new File(directoryPath);
 
         int number = 1;
+        loadList(directoryPath,numbers,wiseSayings,authors);
         System.out.println("== 명언 앱 ==");
 
         while (true) {
@@ -31,13 +30,13 @@ public class Main {
             } else if (cmd.contains("수정")) {
                 updateList(cmd, wiseSayings, numbers, scanner, authors, directoryPath);
             } else if (cmd.contains("종료")) {
-                deleteList(number, directory, directoryPath);
+                deleteList(number, directoryPath);
                 break;
             }
         }
     }
 
-    private static void deleteList(int number, File directory, String directoryPath) throws IOException {
+    private static void deleteList(int number, String directoryPath) throws IOException {
         String lastfilename = String.format("%s\\lastId.txt", directoryPath);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(lastfilename))) {
             writer.write(String.valueOf(number - 1));
@@ -123,6 +122,45 @@ public class Main {
             System.out.println(update_number + "번 명언은 존재하지 않습니다.");
         }
     }
-}
 
+    private static int loadList(String directoryPath, List<Integer> numbers, List<String> wiseSayings, List<String> authors) {
+        File folder = new File(directoryPath);
+        File[] files = folder.listFiles((dir, name) -> name.endsWith(".json"));
+
+        if (files == null) {
+            return 1;
+        }
+
+        int lastId = 1;
+        for (File file : files) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+                int id = 0;
+                String content = "";
+                String author = "";
+
+                while ((line = reader.readLine()) != null) {
+                    line = line.trim();
+                    if (line.startsWith("id")) {
+                        id = Integer.parseInt(line.split(":")[1].trim().replace(",", ""));
+                    } else if (line.startsWith("content")) {
+                        content = line.split(":")[1].trim().replace(",", "").replace("\"", "");
+                    } else if (line.startsWith("author")) {
+                        author = line.split(":")[1].trim().replace(",", "").replace("\"", "");
+                    }
+                }
+
+                numbers.add(id);
+                wiseSayings.add(content);
+                authors.add(author);
+                if (id >= lastId) {
+                    lastId = id + 1; // 마지막 ID 갱신
+                }
+            } catch (IOException e) {
+                System.out.println("파일 읽기 실패: " + file.getName());
+            }
+        }
+        return lastId;
+    }
+}
 
