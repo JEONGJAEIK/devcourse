@@ -1,10 +1,19 @@
 package com.wiseSaying;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class WiseSayingController {
-    WiseSayingService wiseSayingService = new WiseSayingService();
-    WiseSayingRepository wiseSayingRepository = new WiseSayingRepository();
+    private WiseSayingService wiseSayingService;
+    private WiseSayingRepository wiseSayingRepository;
+
+    public WiseSayingController() {
+        ArrayList<WiseSaying> sharedArrayList = new ArrayList<>();
+        this.wiseSayingRepository = new WiseSayingRepository(sharedArrayList);
+        this.wiseSayingService = new WiseSayingService(sharedArrayList, wiseSayingRepository);
+    }
+
+
     Scanner scanner = new Scanner(System.in);
 
     public void exitApp(int number) {

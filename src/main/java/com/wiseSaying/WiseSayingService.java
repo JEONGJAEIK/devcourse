@@ -6,8 +6,13 @@ import java.util.Objects;
 
 public class WiseSayingService {
     String directoryPath = "C:\\Users\\wodlr\\OneDrive\\바탕 화면\\정재익\\프로젝트\\devcourse\\src\\db\\wiseSaying";
-    WiseSayingRepository wiseSayingRepository = new WiseSayingRepository();
-    private final ArrayList<WiseSaying> arrayList = new ArrayList<>();
+    private ArrayList<WiseSaying> arrayList;
+    private WiseSayingRepository wiseSayingRepository;
+
+    public WiseSayingService(ArrayList<WiseSaying> arrayList, WiseSayingRepository wiseSayingRepository) {
+        this.arrayList = arrayList;
+        this.wiseSayingRepository = wiseSayingRepository;
+    }
 
     public void createList(int number, String wiseSay, String author) {
         arrayList.add(new WiseSaying(number, wiseSay, author));
@@ -16,7 +21,7 @@ public class WiseSayingService {
 
     public int newLoadList() {
         File folder = new File(Objects.requireNonNull(directoryPath));
-        File[] files = folder.listFiles((_, name) -> name.endsWith(".json"));
+        File[] files = folder.listFiles((File dir, String name) -> name.endsWith(".json"));
 
         if (files == null) {
             return 1;
@@ -95,7 +100,7 @@ public class WiseSayingService {
     public StringBuilder showList() {
         StringBuilder showList = new StringBuilder();
         for (int i = arrayList.size() - 1; i > - 1; i--) {
-            showList.append(arrayList.get(i).toString() + "\n");
+            showList.append(arrayList.get(i).toString()).append("\n");
         } return showList;
     }
 

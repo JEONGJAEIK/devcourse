@@ -1,6 +1,7 @@
 package com.wiseSaying;
 
 public class WiseSaying {
+
     private int number;
     private String wiseSay;
     private String author;
@@ -10,6 +11,8 @@ public class WiseSaying {
         this.wiseSay = wiseSay;
         this.author = author;
     }
+
+
 
     public int getNumber() {
         return number;

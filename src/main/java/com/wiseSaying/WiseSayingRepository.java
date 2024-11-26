@@ -10,8 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WiseSayingRepository {
+
     String directoryPath = "C:\\Users\\wodlr\\OneDrive\\바탕 화면\\정재익\\프로젝트\\devcourse\\src\\db\\wiseSaying";
-    ArrayList<WiseSaying> arrayList = new ArrayList();
+    private ArrayList<WiseSaying> arrayList;
+
+    public WiseSayingRepository(ArrayList<WiseSaying> arrayList) {
+        this.arrayList = arrayList;
+    }
+
 
     private String createLastId() {
         return String.format("%s\\lastId.txt", directoryPath);
@@ -20,7 +26,7 @@ public class WiseSayingRepository {
     public void createLastIdFile(int number) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(createLastId()))) {
             writer.write(String.valueOf(number - 1));
-        } catch (IOException _) {
+        } catch (IOException ignored) {
         }
     }
 
@@ -40,11 +46,7 @@ public class WiseSayingRepository {
     }
 
     public void deleteListfile(int deleteNumber) {
-        for (int i = arrayList.size() - 1; i > -1; i--) {
-            if (arrayList.get(i).getNumber() == deleteNumber) {
-                arrayList.remove(i);
-            }
-        }
+        arrayList.removeIf(wiseSaying -> wiseSaying.getNumber() == deleteNumber);
         String filename = String.format("%s\\%d.json", directoryPath, deleteNumber);
         File jsonFile = new File(filename);
         jsonFile.delete();
@@ -58,7 +60,7 @@ public class WiseSayingRepository {
             writer.write("\"content\": " + '"' + newWiseSay + '"' + "," + "\n  ");
             writer.write("\"author\": " + '"' + newAuthor + '"' + "\n");
             writer.write("}");
-        } catch (IOException _) {
+        } catch (IOException ignored) {
         }
     }
 
